@@ -41,7 +41,7 @@ fn input()->Input{
         }
     }
     if p.len()==0{
-        println!("{}","Please specify a paramater!".red().bold());
+        println!("{}","Please specify a paramater!".red().bold().italic());
         //println!("{} {} {}", "or use".cyan(), "any".italic().yellow(), "string type".cyan());
         exit(0);
     }
@@ -183,7 +183,7 @@ fn ffinder(base_dir:String, prmtr:&str, e:bool, h:bool) -> std::io::Result<()>{ 
         }
         else {
             if compare(rmv_underline(get_fname(p2.display().to_string())),rmv_underline(prmtr.to_string()),e){
-                println!("File found at: {}",p2.display().to_string().red());
+                println!("File found at: {}",p2.display().to_string().blue());
             }
         }
     }
