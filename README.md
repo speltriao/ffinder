@@ -8,7 +8,7 @@ Fast Rust CLI program for smart-finding files on Linux.
 <p><b>Basic usage:</b> Simply type the file that you are searching.</p>  
 Ex: <blockquote>ffinder My File</blockquote> 
 <br></br>
-<p><b><i>Note:</b></i><p>The search paramater doesn't need to be identical to the file being searched, ffinder tries to be flexible. It also ignores some special characters and intelligently transform others (such as '-' , '_'  and   ',').</p>
+<p><b><i>Note:</b></i>The search paramater doesn't need to be identical to the file being searched, ffinder tries to be flexible. It also ignores some special characters and intelligently transform others (such as '-' , '_'  and   ',').
 
 
 <br></br>
