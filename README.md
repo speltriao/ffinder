@@ -19,6 +19,5 @@ Ex: <blockquote>ffinder My File</blockquote>
   <li>To expand the search to Hidden Directories, specify the <b>-h</b> flag. Ex:<i> ffinder </i> <b>-h</b> <i>My File</i></li>
   <li>If the file extension is especified, ffinder will only return results with the given extension.</li>
 </ol>
-<br></br>
 
 
