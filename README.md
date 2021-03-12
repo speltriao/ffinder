@@ -1,7 +1,7 @@
 # ffinder
 Fast Rust CLI program for smart-finding files on Linux.
 <br></br>
-<p><b><i>Recommended Usage:</b></i>: Copy ffinder to /usr/bin to call it anytime:</p>
+<p><b>Recommended Usage:</b>: Copy ffinder to /usr/bin to call it anytime:</p>
 <p><blockquote>git clone https://github.com/speltriao/ffinder && cd ffinder && chmod +x ffinder && sudo cp ffinder /usr/bin</blockquote></p>
 <p> After, just open a terminal and use ffinder normally.</p>
 <br></br>
