@@ -2,6 +2,8 @@ use std::env;
 use std::mem;
 use colored::*;
 use std::process::exit;
+use std::thread;
+
 
 
 struct Input{
@@ -10,7 +12,6 @@ struct Input{
     extension:bool, //user included the file extension or not (.something)//
     hidden:bool, //search or not in hidden directories
 }
-
 
 fn input()->Input{
     let mut args: Vec<String> = env::args().collect();
@@ -41,8 +42,7 @@ fn input()->Input{
         }
     }
     if p.len()==0{
-        println!("{}","Please specify a paramater!".red().bold());
-        //println!("{} {} {}", "or use".cyan(), "any".italic().yellow(), "string type".cyan());
+        println!("{}","Please specify a paramater!".red().bold().italic());
         exit(0);
     }
     let inp = Input {
@@ -58,7 +58,6 @@ fn rmv_underline(s: String) -> String{
     let rplc: [&str; 6] = ["-", "_", ",","(",")","..."];
     let mut result = s.clone();
     for i in 0..rplc.len() {
-        //println!("{}",rplc[i]);
         result = result.replace(rplc[i], " ");
     }
     result
@@ -67,7 +66,6 @@ fn rmv_underline(s: String) -> String{
 fn get_fname(stri: String) -> String{
     let mut s = stri.clone();
     let mut i = 0;
-    //println!("{}{}",s.len(),s.len()-1);
     if s.chars().last().unwrap()=='/'{
         s.pop();
     }
@@ -88,6 +86,17 @@ fn get_home()-> String{
     s
 }
 
+fn rmv_extension(stri: String) -> String{
+    let mut s = stri.clone();
+    let mut i = 0;
+    if s.chars().last().unwrap()=='/'{
+        s.pop();
+    }
+    if let Some(n) = s.rfind("."){
+        i = n;
+    }
+    s[..i].to_string()
+}
 
 fn vectorize(stri: String,ext:bool) -> Vec<String> { //create a vector in which every element is a single word from string
     let mut vec: Vec<String> = Vec::new();
@@ -113,38 +122,32 @@ fn vectorize(stri: String,ext:bool) -> Vec<String> { //create a vector in which 
     vec
 } 
 
+
 fn string_to_static_str(s: String) -> &'static str {
     Box::leak(s.into_boxed_str())
 }
 
-fn compare(current:String,prmtr:String,  ext:bool) -> bool {
-    if !current.contains(" ") { //Current file is compound of a single word
-        if prmtr.to_uppercase()==current.to_uppercase(){
+fn compare(mut current:String,prmtr:String,  ext:bool) -> bool {
+    if !ext { //If user didn't specified extension, remove it from file being compared
+        current = rmv_extension(current);
+    }
+    if !prmtr.contains(" ") { //Current file is compound of a single word
+        if prmtr.to_uppercase()==current.to_uppercase() {
             return true;
         }
         else {
             return false;
         }
     }
-    let (p,mut c) = (vectorize(prmtr,ext),vectorize(current,ext));
+
+    let (p,c) = (vectorize(prmtr,ext),vectorize(current,ext));
     if ext && p[p.len()-1]!=c[c.len()-1]{//user gave extension, and the current extension doesn't match.
         return false;
     }
-    if !ext{
-        let size = c.len()-1;
-        let s = c[size].clone();
-        match s.find(".") {
-            Some(n) => {
-                let slice:String = s[..n].to_string();
-                c[size]=slice;
-            }
-            None => (),
-        }
 
-        mem::forget(s);
-    }
     let (h, mut count):(f32, u8) = ((c.len() as f32 / 2.0).round(), 0);
     let half = h as u8;
+    
     for s1 in c {
         for s2 in &p {
             if s1.to_uppercase()==s2.to_uppercase(){ //case insensitive comparison
@@ -161,9 +164,9 @@ fn compare(current:String,prmtr:String,  ext:bool) -> bool {
 }
 
 
-fn ffinder(base_dir:String, prmtr:&str, e:bool, h:bool) -> std::io::Result<()>{ // prmtr:String
+fn ffinder(base_dir:String, prmtr:&'static str, e:bool, h:bool) -> std::io::Result<()>{ // prmtr:String
+    let mut handle_vec = vec![];
     let pth = std::fs::read_dir(&base_dir)?;
-        
     for p in pth {
         let p2 = p?.path().clone();
         if p2.is_dir() {
@@ -171,18 +174,33 @@ fn ffinder(base_dir:String, prmtr:&str, e:bool, h:bool) -> std::io::Result<()>{ 
                 let sstring:String = get_fname(p2.display().to_string());
                 let slice:String = sstring[..1].to_string();
                 if slice != ".".to_string() {
-                    ffinder(p2.display().to_string(),prmtr,e,h);
+                    let handle = thread::spawn(move || {
+                        ffinder(p2.display().to_string(),prmtr,e,h);
+                    });
+                    handle_vec.push(handle);
+                    
                 }
             }
             else {//search include hidden directories
-                ffinder(p2.display().to_string(),prmtr,e,h);
+                let handle2 = thread::spawn(move || {
+                    ffinder(p2.display().to_string(),prmtr,e,h);
+                });
+                handle_vec.push(handle2);
             } 
         }
         else {
             if compare(rmv_underline(get_fname(p2.display().to_string())),rmv_underline(prmtr.to_string()),e){
-                println!("File found at: {}",p2.display().to_string().red());
+                let handle3 = thread::spawn(move || {
+                    if compare(rmv_underline(get_fname(p2.display().to_string())),rmv_underline(prmtr.to_string()),e){
+                        println!("File found at: {}",p2.display().to_string().blue());
+                    }
+                });
+                handle_vec.push(handle3);
             }
         }
+    }
+    for h in handle_vec{
+        h.join().unwrap();
     }
     Ok(())
 }
@@ -192,4 +210,3 @@ fn main(){
     let i = input();
     ffinder(i.base_dir,string_to_static_str(i.prmtr),i.extension,i.hidden);
 }
-
