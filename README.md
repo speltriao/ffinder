@@ -20,6 +20,6 @@ Ex: <blockquote>ffinder My File</blockquote>
   <li>If the file extension is especified, ffinder will only return results with the given extension.</li>
 </ol>
 
-
+<br></br>
 <p><b>Uninstall:</b>:Remove ffinder from /usr/bin:</p>
 <p><blockquote>sudo rm /usr/bin/ffinder /usr/bin</blockquote></p>
