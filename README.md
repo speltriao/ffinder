@@ -20,5 +20,5 @@ Ex: <blockquote>ffinder My file</blockquote>
 </ol>
 
 <br></br>
-<p><b>Uninstall:</b>:Remove ffinder from /usr/bin:</p>
+<p><b>Uninstall:</b> Remove ffinder from /usr/bin:</p>
 <p><blockquote>sudo rm /usr/bin/ffinder</blockquote></p>
