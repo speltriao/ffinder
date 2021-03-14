@@ -22,4 +22,4 @@ Ex: <blockquote>ffinder My File</blockquote>
 
 <br></br>
 <p><b>Uninstall:</b>:Remove ffinder from /usr/bin:</p>
-<p><blockquote>sudo rm /usr/bin/ffinder /usr/bin</blockquote></p>
+<p><blockquote>sudo rm /usr/bin/ffinder</blockquote></p>
