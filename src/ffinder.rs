@@ -139,14 +139,12 @@ fn compare(mut current:String,prmtr:String,  ext:bool) -> bool {
             return false;
         }
     }
-
     let (p,c) = (vectorize(prmtr,ext),vectorize(current,ext));
+    
     if ext && p[p.len()-1]!=c[c.len()-1]{//user gave extension, and the current extension doesn't match.
         return false;
     }
-
-    let (h, mut count):(f32, u8) = ((c.len() as f32 / 2.0).round(), 0);
-    let half = h as u8;
+    let (size, mut count):(usize, usize) = (p.len(), 0);
     
     for s1 in c {
         for s2 in &p {
@@ -155,15 +153,12 @@ fn compare(mut current:String,prmtr:String,  ext:bool) -> bool {
             }
         }
     }
-
     mem::forget(p);
-    if count>half { 
+    if count>=size { 
         return true;
     }
     false
 }
-
-
 fn ffinder(base_dir:String, prmtr:&'static str, e:bool, h:bool) -> std::io::Result<()>{ // prmtr:String
     let mut handle_vec = vec![];
     let pth = std::fs::read_dir(&base_dir)?;
@@ -189,14 +184,12 @@ fn ffinder(base_dir:String, prmtr:&'static str, e:bool, h:bool) -> std::io::Resu
             } 
         }
         else {
-            if compare(rmv_underline(get_fname(p2.display().to_string())),rmv_underline(prmtr.to_string()),e){
-                let handle3 = thread::spawn(move || {
-                    if compare(rmv_underline(get_fname(p2.display().to_string())),rmv_underline(prmtr.to_string()),e){
-                        println!("File found at: {}",p2.display().to_string().blue());
-                    }
-                });
-                handle_vec.push(handle3);
-            }
+            let handle3 = thread::spawn(move || {
+                if compare(rmv_underline(get_fname(p2.display().to_string())),rmv_underline(prmtr.to_string()),e){
+                    println!("File found at: {}",p2.display().to_string().blue());
+                }
+            });
+            handle_vec.push(handle3);
         }
     }
     for h in handle_vec{
