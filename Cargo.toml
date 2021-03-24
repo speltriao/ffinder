@@ -9,6 +9,8 @@ edition = "2018"
 [dependencies]
 home = "0.5.3"
 colored = "2"
+walkdir = "2.3.2"
+
 
 [[bin]]
 name = "ffinder"
