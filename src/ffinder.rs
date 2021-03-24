@@ -53,8 +53,6 @@ fn input()->Input{
     inp
 }
 
-
-
 fn get_home()-> String{
     let mut s =  String::new(); 
     match home::home_dir() {
@@ -66,7 +64,6 @@ fn get_home()-> String{
     s
 }
 
-
 fn rmv_underline(s: String) -> String{
     let rplc: [&str; 6] = ["-", "_", ",","(",")","..."];
     let mut result = s.clone();
@@ -75,7 +72,6 @@ fn rmv_underline(s: String) -> String{
     }
     result
 }
-
 
 fn get_fname(stri: String) -> String{
     let mut s = stri.clone();
@@ -88,7 +84,6 @@ fn get_fname(stri: String) -> String{
     }
     s[i+1..].to_string()
 }
-
 
 fn rmv_extension(stri: String) -> String{
     let mut s = stri.clone();
@@ -121,11 +116,9 @@ fn vectorize(stri: String,ext:bool) -> Vec<String> { //create a vector in which 
             None => (),
         }
         mem::forget(s);
-        
     }
     vec
 } 
-
 
 fn string_to_static_str(s: String) -> &'static str {
     Box::leak(s.into_boxed_str())
@@ -176,8 +169,7 @@ fn is_hidden(entry: &DirEntry,h:bool) -> bool {
     }
 }
 
-
-fn ffinder(base_dir:String, prmtr:&'static str, e:bool, h:bool) -> std::io::Result<()>{ 
+fn ffinder(base_dir:String, prmtr:&'static str, e:bool, h:bool){ 
     let walker = WalkDir::new(base_dir).follow_links(true).into_iter();
     for entry in walker.filter_entry(|e| !is_hidden(e,h)).filter_map(|e| e.ok()) {
         let p2 = entry.path().clone();
@@ -187,11 +179,10 @@ fn ffinder(base_dir:String, prmtr:&'static str, e:bool, h:bool) -> std::io::Resu
             }
         }
     }
-    Ok(()) 
 }   
 
 fn main(){
     let i = input();
     let inp =string_to_static_str(rmv_underline(i.prmtr));
-    ffinder(i.base_dir,inp,i.extension,i.hidden).unwrap();
+    ffinder(i.base_dir,inp,i.extension,i.hidden);
 }
