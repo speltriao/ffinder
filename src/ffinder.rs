@@ -2,8 +2,7 @@ use std::env;
 use std::mem;
 use colored::*;
 use std::process::exit;
-use std::thread;
-
+use walkdir::{DirEntry, WalkDir};
 
 
 struct Input{
@@ -54,6 +53,20 @@ fn input()->Input{
     inp
 }
 
+
+
+fn get_home()-> String{
+    let mut s =  String::new(); 
+    match home::home_dir() {
+        Some(path) =>{
+            s = path.display().to_string();
+        } 
+        None =>(),
+    }
+    s
+}
+
+
 fn rmv_underline(s: String) -> String{
     let rplc: [&str; 6] = ["-", "_", ",","(",")","..."];
     let mut result = s.clone();
@@ -62,6 +75,7 @@ fn rmv_underline(s: String) -> String{
     }
     result
 }
+
 
 fn get_fname(stri: String) -> String{
     let mut s = stri.clone();
@@ -75,16 +89,6 @@ fn get_fname(stri: String) -> String{
     s[i+1..].to_string()
 }
 
-fn get_home()-> String{
-    let mut s =  String::new(); 
-    match home::home_dir() {
-        Some(path) =>{
-            s = path.display().to_string();
-        } 
-        None =>(),
-    }
-    s
-}
 
 fn rmv_extension(stri: String) -> String{
     let mut s = stri.clone();
@@ -159,47 +163,35 @@ fn compare(mut current:String,prmtr:String,  ext:bool) -> bool {
     }
     false
 }
-fn ffinder(base_dir:String, prmtr:&'static str, e:bool, h:bool) -> std::io::Result<()>{ // prmtr:String
-    let mut handle_vec = vec![];
-    let pth = std::fs::read_dir(&base_dir)?;
-    for p in pth {
-        let p2 = p?.path().clone();
-        if p2.is_dir() {
-            if !h{ //search doesn't include hidden directories
-                let sstring:String = get_fname(p2.display().to_string());
-                let slice:String = sstring[..1].to_string();
-                if slice != ".".to_string() {
-                    let handle = thread::spawn(move || {
-                        ffinder(p2.display().to_string(),prmtr,e,h);
-                    });
-                    handle_vec.push(handle);
-                    
-                }
-            }
-            else {//search include hidden directories
-                let handle2 = thread::spawn(move || {
-                    ffinder(p2.display().to_string(),prmtr,e,h);
-                });
-                handle_vec.push(handle2);
-            } 
-        }
-        else {
-            let handle3 = thread::spawn(move || {
-                if compare(rmv_underline(get_fname(p2.display().to_string())),rmv_underline(prmtr.to_string()),e){
-                    println!("File found at: {}",p2.display().to_string().blue());
-                }
-            });
-            handle_vec.push(handle3);
-        }
+
+fn is_hidden(entry: &DirEntry,h:bool) -> bool {
+    if h{
+        return entry.file_name()
+            .to_str()
+            .map(|s| s.starts_with("."))
+            .unwrap_or(false);
     }
-    for h in handle_vec{
-        h.join().unwrap();
+    else{
+        return false;
     }
-    Ok(())
 }
 
 
+fn ffinder(base_dir:String, prmtr:&'static str, e:bool, h:bool) -> std::io::Result<()>{ 
+    let walker = WalkDir::new(base_dir).follow_links(true).follow_links(true).into_iter();
+    for entry in walker.filter_entry(|e| !is_hidden(e,h)).filter_map(|e| e.ok()) {
+        let p2 = entry.path().clone();
+        if p2.is_file(){
+            if compare(rmv_underline(get_fname(p2.display().to_string())),rmv_underline(prmtr.to_string()),e){
+                println!("File found at: {}",p2.display().to_string().blue());
+            }
+        }
+    }
+    Ok(()) 
+}   
+
 fn main(){
     let i = input();
-    ffinder(i.base_dir,string_to_static_str(i.prmtr),i.extension,i.hidden);
+    let inp =string_to_static_str(rmv_underline(i.prmtr));
+    ffinder(i.base_dir,inp,i.extension,i.hidden).unwrap();
 }
