@@ -165,7 +165,7 @@ fn compare(mut current:String,prmtr:String,  ext:bool) -> bool {
 }
 
 fn is_hidden(entry: &DirEntry,h:bool) -> bool {
-    if h{
+    if !h{
         return entry.file_name()
             .to_str()
             .map(|s| s.starts_with("."))
@@ -178,7 +178,7 @@ fn is_hidden(entry: &DirEntry,h:bool) -> bool {
 
 
 fn ffinder(base_dir:String, prmtr:&'static str, e:bool, h:bool) -> std::io::Result<()>{ 
-    let walker = WalkDir::new(base_dir).follow_links(true).follow_links(true).into_iter();
+    let walker = WalkDir::new(base_dir).follow_links(true).into_iter();
     for entry in walker.filter_entry(|e| !is_hidden(e,h)).filter_map(|e| e.ok()) {
         let p2 = entry.path().clone();
         if p2.is_file(){
