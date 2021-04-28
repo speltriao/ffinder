@@ -108,6 +108,3 @@ public class Main {
 		msg(6);
 	}
 }
-	
-
-
