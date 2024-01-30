@@ -1,5 +1,5 @@
 # ffinder
-Rust CLI program for smart-finding files on Linux.
+Rust CLI program for smart-finding files in Linux.
 <br></br>
 <p><b>Recommended Installation:</b> Copy ffinder to /usr/bin to call it anytime:</p>
 <p><blockquote>git clone https://github.com/speltriao/ffinder && cd ffinder && chmod +x ffinder && sudo cp ffinder /usr/bin</blockquote></p>
